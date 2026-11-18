@@ -19,12 +19,12 @@ class _LoginScreenState extends State<LoginScreen> {
   void login() {
     if (!formKey.currentState!.validate()) return;
 
-    final valid = DemoAuth.login(
+    final isValid = DemoAuth.login(
       usernameController.text.trim(),
       passwordController.text,
     );
 
-    if (valid) {
+    if (isValid) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const MainScreen()),
       );

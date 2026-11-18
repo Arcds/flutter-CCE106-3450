@@ -62,7 +62,7 @@ class _SocialMediaPageState extends State<SocialMediaPage> {
               child: Text('No posts yet. Create one!'),
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 96),
               itemCount: posts.length,
               itemBuilder: (context, index) {
                 final post = posts[index];
