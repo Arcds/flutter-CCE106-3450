@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "19526911895",
+    "project_id": "cce-106-lab-activity",
+    "storage_bucket": "cce-106-lab-activity.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:19526911895:android:589be77bf03216b482a6d2",
+        "android_client_info": {
+          "package_name": "com.example.tigbabao_navigation_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwe-MrCPb9Uhuum9RLfPQTDmAeI8r1InI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
