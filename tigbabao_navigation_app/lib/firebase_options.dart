@@ -57,7 +57,6 @@ class DefaultFirebaseOptions {
     projectId: 'cce-106-lab-activity',
     storageBucket: 'cce-106-lab-activity.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyCHwIe2WKfzbYRhkf2gX6l7ZDRMC8sv4-E',
     appId: '1:19526911895:ios:9bc8cf27b4785b7982a6d2',
@@ -66,7 +65,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'cce-106-lab-activity.firebasestorage.app',
     iosBundleId: 'com.example.tigbabaoNavigationApp',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyCHwIe2WKfzbYRhkf2gX6l7ZDRMC8sv4-E',
     appId: '1:19526911895:ios:9bc8cf27b4785b7982a6d2',
