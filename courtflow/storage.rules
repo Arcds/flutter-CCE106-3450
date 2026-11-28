@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function userPath() {
+      return /databases/(default)/documents/users/$(request.auth.uid);
+    }
+
+    function userData() {
+      return firestore.get(userPath()).data;
+    }
+
+    function isStaffOf(facilityId) {
+      return signedIn() && firestore.exists(userPath()) && (
+        userData().role == 'owner' ||
+        (
+          userData().clubRoles is map &&
+          facilityId in userData().clubRoles &&
+          userData().clubRoles[facilityId] in ['owner', 'staff']
+        )
+      );
+    }
+
+    function bookingData(facilityId, bookingId) {
+      return firestore.get(
+        /databases/(default)/documents/venues/$(facilityId)/bookings/$(bookingId)
+      ).data;
+    }
+
+    function canUploadProof(facilityId, bookingId) {
+      return signedIn() &&
+        firestore.exists(
+          /databases/(default)/documents/venues/$(facilityId)/bookings/$(bookingId)
+        ) &&
+        bookingData(facilityId, bookingId).playerId == request.auth.uid &&
+        bookingData(facilityId, bookingId).status == 'pending_payment' &&
+        bookingData(facilityId, bookingId).paymentMethod == 'ewallet';
+    }
+
+    match /paymentProofs/{facilityId}/{bookingId}/{fileName} {
+      allow read: if isStaffOf(facilityId);
+      allow write: if canUploadProof(facilityId, bookingId)
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if false;
+    }
+  }
+}

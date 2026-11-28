@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "325936901021",
+    "project_id": "cce106-finalproject-4c95e",
+    "storage_bucket": "cce106-finalproject-4c95e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:325936901021:android:078c2737913b9df6cc1d74",
+        "android_client_info": {
+          "package_name": "com.arche.courtflow"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCUACf54WAT5zMMFcZlSCaNCDSogwxrM4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

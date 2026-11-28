@@ -1,0 +1,121 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function uid() {
+      return request.auth.uid;
+    }
+
+    function userPath() {
+      return /databases/$(database)/documents/users/$(uid());
+    }
+
+    function userData() {
+      return get(userPath()).data;
+    }
+
+    function hasProfile() {
+      return signedIn() && exists(userPath());
+    }
+
+    function isGlobalOwner() {
+      return hasProfile() && userData().role == 'owner';
+    }
+
+    function isStaffOf(facilityId) {
+      return hasProfile() && (
+        userData().role == 'owner' ||
+        (
+          userData().clubRoles is map &&
+          facilityId in userData().clubRoles &&
+          userData().clubRoles[facilityId] in ['owner', 'staff']
+        )
+      );
+    }
+
+    function isPublicVenue(facilityId) {
+      return get(/databases/$(database)/documents/venues/$(facilityId)).data.publicDirectoryVisible == true;
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && (request.auth.uid == userId || isGlobalOwner());
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role == 'player'
+        && request.resource.data.clubRoles is map
+        && request.resource.data.clubRoles.size() == 0
+        && request.resource.data.name is string
+        && request.resource.data.email is string;
+      allow update: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.clubRoles == resource.data.clubRoles
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name',
+          'email',
+          'fcmTokens'
+        ]);
+      allow delete: if false;
+    }
+
+    match /venues/{facilityId} {
+      allow read: if resource.data.publicDirectoryVisible == true || isStaffOf(facilityId);
+      allow create, delete: if false;
+      allow update: if isStaffOf(facilityId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'name',
+          'slug',
+          'location',
+          'rules',
+          'announcements',
+          'paymentInstructions',
+          'acceptedPaymentMethods',
+          'cashHoldMinutes',
+          'operatingHours',
+          'publicDirectoryVisible',
+          'subscriptionTier'
+        ]);
+
+      match /courts/{courtId} {
+        allow read: if isPublicVenue(facilityId) || isStaffOf(facilityId);
+        allow create, update, delete: if isStaffOf(facilityId);
+
+        match /slots/{slotId} {
+          allow read: if isPublicVenue(facilityId) || isStaffOf(facilityId);
+          allow write: if false;
+        }
+      }
+
+      match /bookings/{bookingId} {
+        allow read: if signedIn() && (
+          resource.data.playerId == uid() ||
+          isStaffOf(facilityId)
+        );
+        allow write: if false;
+      }
+
+      match /openPlaySessions/{sessionId} {
+        allow read: if isPublicVenue(facilityId) || isStaffOf(facilityId);
+        allow write: if isStaffOf(facilityId);
+      }
+
+      match /checkIns/{checkInId} {
+        allow read: if isStaffOf(facilityId);
+        allow create: if isStaffOf(facilityId)
+          && request.resource.data.bookingId is string
+          && request.resource.data.staffId == uid()
+          && request.resource.data.deviceId is string;
+        allow update, delete: if false;
+      }
+    }
+
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}
